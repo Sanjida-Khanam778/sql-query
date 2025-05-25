@@ -132,23 +132,48 @@ VALUES ('Derek Fox', 'Coastal Plains');
 
 -- problem 2
 
-SELECT count(DISTINCT species_id) as unique_species_count from sightings 
+SELECT count(DISTINCT species_id) as unique_species_count
+from sightings
 
 -- problem 3
 -- Find all sightings where the location includes "Pass"
 
 SELECT * FROM sightings WHERE location LIKE '%Pass%'
 
-
 -- problem 4
 
-SELECT name,  count(*) AS total_sightings  FROM rangers 
-JOIN sightings USING(ranger_id) GROUP BY ranger_id ORDER BY name;
+SELECT name, count(*) AS total_sightings
+FROM rangers
+    JOIN sightings USING (ranger_id)
+GROUP BY
+    ranger_id
+ORDER BY name;
 
 -- problem 5
 -- 5️⃣ List species that have never been sighted.
 
+SELECT common_name
+FROM species
+    Left JOIN sightings USING (species_id)
+WHERE
+    sighting_id IS NULL;
 
+-- problem 6
+-- 6️⃣ Show the most recent 2 sightings.
 
-SELECT * FROM species
-JOIN sightings USING(species_id)
+SELECT common_name, sighting_time, name
+FROM sightings
+    JOIN species USING (species_id)
+    JOIN rangers USING (ranger_id)
+ORDER BY sighting_time DESC
+LIMIT 2
+
+-- problem 7
+-- 7️⃣ Update all species discovered before year 1800 to have status 'Historic'.
+
+UPDATE species SET conservation_status='Historic' WHERE extract( year FROM discovery_date ) < 1800;
+
+-- problem 8
+-- 8️⃣ Label each sighting's time of day as 'Morning', 'Afternoon', or 'Evening'.
+
+SELECT extract(TIMESTAMP FROM sighting_time) FROM sightings
